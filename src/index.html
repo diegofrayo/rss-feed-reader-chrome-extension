@@ -2,15 +2,79 @@
 <html>
 <head>
 	<title>RSS Reader</title>
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"/>
+	<link rel="stylesheet" href="css/styles.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 	<script src="js/vendor/jquery.min.js"></script>
 	<script src="js/main.js"></script>
 </head>
-<body>
-	<div>Hello World</div>
-	<div>Add RSS</div>
-	<div>Home</div>
-	<div>Channel Details</div>
-	<a href="http://google.com" target="_blank">Link</a>
+<body class="grey darken-4">
+	<div class="card grey darken-3" id="create-rss-channel-container">
+		<div class="card-content white-text">
+			<span class="card-title">Add RSS Channel</span>
+			<div class="card-body">
+				<div class="input-field">
+					<input placeholder="Name" id="name" type="text" class="validate">
+					<label for="name">Name</label>
+				</div>
+				<div class="input-field">
+					<input placeholder="URL" id="url" type="text" class="validate">
+					<label for="url">URL</label>
+				</div>
+			</div>
+		</div>
+		<div class="card-action">
+			<a class="waves-effect waves-light btn blue accent-4 right" id="add-rss-channel-btn">Add</a>
+			<a class="waves-effect waves-light btn red accent-4 right">Cancel</a>
+		</div>
+	</div>
+	<div class="card grey darken-3" id="rss-channels-container">
+		<div class="card-content white-text">
+			<span class="card-title">RSS Channels</span>
+			<div class="card-body">
+				<ul class="collection">
+					<a href="#" class="collection-item">
+						Alvin
+						<i class="material-icons right enter-icon">send</i>
+					</a>
+					<a href="#" class="collection-item">
+						Alvin
+						<i class="material-icons right enter-icon">send</i>
+					</a>
+				</ul>
+			</div>
+		</div>
+		<div class="card-action">
+			<a class="btn-floating btn-md waves-effect waves-light blue accent-4 right">
+				<i class="material-icons">add</i>
+			</a>
+			<a class="btn-floating btn-md waves-effect waves-light green accent-4 right">
+				<i class="material-icons">sync</i>
+			</a>
+		</div>
+	</div>
+	<div class="card grey darken-3" id="rss-channel-details-container">
+		<div class="card-content white-text">
+			<span class="card-title">RSS Channel Name</span>
+			<div class="card-body">
+				<div class="collection">
+					<a href="#!" class="collection-item">Link</a>
+					<a href="#!" class="collection-item">Link</a>
+					<a href="#!" class="collection-item">Link</a>
+					<a href="#!" class="collection-item">Link</a>
+				</div>
+			</div>
+		</div>
+		<div class="card-action">
+			<a class="btn-floating btn-md waves-effect waves-light red accent-4 right">
+				<i class="material-icons">clear</i>
+			</a>
+			<a class="btn-floating btn-md waves-effect waves-light green accent-4 right">
+				<i class="material-icons">sync</i>
+			</a>
+		</div>
+	</div>
 </body>
 </html>

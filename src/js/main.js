@@ -36,4 +36,5 @@ function getXMLFile(url) {
 
 $(document).ready(function() {
 	BookmarksUtil.getFolder(BookmarksUtil.OTHER_BOOKMARKS_FOLDER_ID);
+	Materialize.updateTextFields();
 });

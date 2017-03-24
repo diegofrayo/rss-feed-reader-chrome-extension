@@ -1,3 +1,64 @@
-div{
-	border: 1px solid #333;
+body{
+	font-family: 'Roboto';
+	font-size: 16px;
+	height: 400px;
+	padding: 10px;
+	width: 400px;
+}
+
+.card{
+	min-height: 380px;
+}
+
+.card .card-title{
+	color: #fff176;
+	font-weight: bold;
+	min-height: 40px;
+}
+
+.card-body{
+	height: 210px;
+	overflow: auto;
+}
+
+.card-action{}
+
+.collection{
+	border: none;
+	margin: 0;
+}
+
+.collection a.collection-item{
+	background-color: #252525;
+	border-bottom: 1px solid #333333;
+	color: #9c9c9c;
+	font-size: 1em;
+}
+
+.collection a.collection-item:not(.active):hover{
+	background-color: #353535;
+}
+
+.enter-icon{
+	color: #eeeeee;
+}
+
+#create-rss-channel-container{
+	display: none;
+}
+
+#rss-channels-container{
+	/* display: none; */
+}
+
+#rss-channel-details-container{
+	display: none;
+}
+
+#add-rss-channel-btn{
+	margin-left: 10px;
+}
+
+.btn-floating{
+	margin-left: 10px;
 }
