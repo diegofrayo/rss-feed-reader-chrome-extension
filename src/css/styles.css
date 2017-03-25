@@ -29,7 +29,11 @@ body{
 }
 
 .card-body{
+	align-items: center;
+	display: flex;
+	flex-direction: row;
 	height: 230px;
+	justify-content: center;
 	overflow: auto;
 }
 
@@ -40,8 +44,11 @@ body{
 
 /* Lists*/
 .collection{
+	align-self: stretch;
 	border: none;
+	flex-grow: 1;
 	margin: 0;
+	overflow: auto;
 }
 
 .collection .collection-item{
@@ -75,6 +82,12 @@ body{
 }
 
 
+/* Add RSS Channel View elements */
+#add-rss-channel-form{
+	flex-grow: 1;
+}
+
+
 /* RSS Channel Details elements */
 .rss-channel-link{
 	position: relative;
@@ -95,4 +108,13 @@ body{
 	left: 0;
 	position: absolute;
 	margin: 5px;
+}
+
+#error-message{
+	background-color: #f2dede;
+	border-color: #ebccd1;
+	border-radius: 5px;
+	color: #a94442;
+	display: none;
+	padding: 10px;
 }

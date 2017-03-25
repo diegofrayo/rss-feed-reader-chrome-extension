@@ -95,7 +95,7 @@ function printRSSChannelsLinks(items) {
 		html += getRSSChannelLinkTemplate(index, link);
 	});
 
-	jQuery('#rss-channel-links-ul').html(html);
+	jQuery('#rss-channel-links-ul').html(html).show();
 	attachOnClickEventToRSSChannelLinks();
 }
 
@@ -175,6 +175,12 @@ function saveRSSChannelLinks(links, rssChannelId) {
 	}));
 }
 
+function rejectSyncRSSChannel(rssChannel, defered) {
+	rssChannel.newArticlesNumber = 0;
+	window.localStorage.removeItem('rss_channel_' + rssChannel.id);
+	return defered.reject(rssChannel);
+}
+
 function syncRSSChannel(rssChannel, forceCache) {
 
 	const dfd = jQuery.Deferred();
@@ -184,7 +190,6 @@ function syncRSSChannel(rssChannel, forceCache) {
 	if (rssChannelItemsCache && !forceCache) {
 
 		dfd.resolve({
-			newArticlesNumber,
 			links: rssChannelItemsCache
 		});
 
@@ -209,6 +214,10 @@ function syncRSSChannel(rssChannel, forceCache) {
 							url: link.find('link').text().trim()
 						});
 					});
+
+					if (links.length === 0) {
+						return rejectSyncRSSChannel(rssChannel, dfd);
+					}
 
 					const rssChannelItemsCache = getRSSChannelLinks(rssChannel.id);
 
@@ -235,19 +244,19 @@ function syncRSSChannel(rssChannel, forceCache) {
 					}
 
 					saveRSSChannelLinks(links, rssChannel.id);
+					rssChannel.newArticlesNumber = newArticlesNumber;
 
 					dfd.resolve({
-						newArticlesNumber,
 						links
 					});
 
 				} catch (e) {
-					dfd.reject('Error');
+					rejectSyncRSSChannel(rssChannel, dfd);
 				}
 
 			},
 			error: (data) => {
-				dfd.reject('Error');
+				rejectSyncRSSChannel(rssChannel, dfd);
 			}
 		});
 
@@ -272,27 +281,19 @@ function attachOnClickEventToRSSChannelsItem() {
 		const item = $(this);
 		rssChannelSelected = getRSSChannelById(item.data('rss-channel-id'), rssChannelsList);
 
-		if (rssChannelSelected !== null) {
+		const callback = () => {
+			jQuery('#rss-channel-links-ul').hide();
+			jQuery('#error-message').hide();
+			$.when(syncRSSChannel(rssChannelSelected))
+				.then((result) => {
+					printRSSChannelsLinks(result.links);
+				}, (error) => {
+					jQuery('#error-message').text('RSS Channel content cannot be loaded.').show();
+				});
+		};
 
-			const callback = () => {
-				jQuery('#rss-channel-links-ul').html('');
-				$.when(syncRSSChannel(rssChannelSelected))
-					.then((result) => {
-						rssChannelSelected.newArticlesNumber = result.newArticlesNumber;
-						printRSSChannelsLinks(result.links);
-					}, (error) => {
-						// TODO
-						console.log(error);
-					});
-			};
-
-			cardsTransition('#rss-channels-list-container', '#rss-channel-details-container', callback);
-			$('#rss-channel-title').text(rssChannelSelected.title);
-
-		} else {
-			// TODO: Error
-		}
-
+		cardsTransition('#rss-channels-list-container', '#rss-channel-details-container', callback);
+		$('#rss-channel-title').text(rssChannelSelected.title);
 	});
 
 }
@@ -335,7 +336,17 @@ $(document).ready(() => {
 	});
 
 	$('#update-all-rss-channels-btn').on('click', () => {
-		// TODO
+
+		const defereds = rssChannelsList.map((rssChannel) => {
+			return syncRSSChannel(rssChannel);
+		});
+
+		$.when.apply($, defereds).then(() => {
+			printRSSChannels(rssChannelsList);
+		}, () => {
+			printRSSChannels(rssChannelsList);
+		});
+
 	});
 
 	$('#add-rss-channel-form').on('submit', (event) => {
@@ -375,15 +386,14 @@ $(document).ready(() => {
 
 	$('#sync-rss-channel-btn').on('click', () => {
 
-		jQuery('#rss-channel-links-ul').html('');
+		jQuery('#rss-channel-links-ul').hide();
+		jQuery('#error-message').hide();
 
 		$.when(syncRSSChannel(rssChannelSelected, true))
 			.then((result) => {
-				rssChannelSelected.newArticlesNumber = result.newArticlesNumber;
 				printRSSChannelsLinks(result.links);
 			}, (error) => {
-				// TODO
-				console.log(error);
+				jQuery('#error-message').text('RSS Channel content cannot be loaded.').show();
 			});
 
 	});

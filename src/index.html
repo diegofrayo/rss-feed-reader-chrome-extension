@@ -27,7 +27,7 @@
 						<input placeholder="URL" id="input-url" type="url" class="validate" required>
 						<label class="active" for="input-url">URL</label>
 					</div>
-					<button type="submit" class="waves-effect waves-light btn blue accent-4 right" id="add-rss-channel-btn">Add</button>
+					<button type="submit" class="waves-effect waves-light btn blue accent-4 right" id="add-rss-channel-btn" title="Add RSS Channel">Add</button>
 				</form>
 			</div>
 		</div>
@@ -40,10 +40,10 @@
 			</div>
 		</div>
 		<div class="card-action">
-			<a class="btn-floating btn-md waves-effect waves-light blue accent-4 right" id="show-add-rss-channel-view-btn">
+			<a class="btn-floating btn-md waves-effect waves-light blue accent-4 right" id="show-add-rss-channel-view-btn" title="Add RSS Channel">
 				<i class="material-icons">add</i>
 			</a>
-			<a class="btn-floating btn-md waves-effect waves-light green accent-4 right" id="update-all-rss-channels-btn">
+			<a class="btn-floating btn-md waves-effect waves-light green accent-4 right" id="update-all-rss-channels-btn" title="Sync All RSS Channels">
 				<i class="material-icons">sync</i>
 			</a>
 		</div>
@@ -56,13 +56,14 @@
 			<span class="card-title" id="rss-channel-title">RSS Channel Name</span>
 			<div class="card-body">
 				<ul class="collection" id="rss-channel-links-ul"></ul>
+				<p id="error-message"><p/>
 			</div>
 		</div>
 		<div class="card-action">
-			<a class="btn-floating btn-md waves-effect waves-light red accent-4 right" id="remove-rss-channel-btn">
+			<a class="btn-floating btn-md waves-effect waves-light red accent-4 right" id="remove-rss-channel-btn" title="Remove">
 				<i class="material-icons">clear</i>
 			</a>
-			<a class="btn-floating btn-md waves-effect waves-light green accent-4 right" id="sync-rss-channel-btn">
+			<a class="btn-floating btn-md waves-effect waves-light green accent-4 right" id="sync-rss-channel-btn" title="Sync">
 				<i class="material-icons">sync</i>
 			</a>
 		</div>
