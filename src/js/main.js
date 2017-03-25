@@ -85,7 +85,7 @@ function printRSSChannels(rssChannelsList) {
 	});
 
 	jQuery('#rss-channels-list-ul').html(html);
-	attachOnClickEventToRSSChannelsList();
+	attachOnClickEventToRSSChannelsItem();
 }
 
 function printRSSChannelsLinks(items) {
@@ -179,11 +179,12 @@ function syncRSSChannel(rssChannel, forceCache) {
 
 	const dfd = jQuery.Deferred();
 	const rssChannelItemsCache = getRSSChannelLinks(rssChannel.id);
-	let newArticlesNumber = 0;
+	let newArticlesNumber = rssChannel.newArticlesNumber;
 
 	if (rssChannelItemsCache && !forceCache) {
 
 		dfd.resolve({
+			newArticlesNumber,
 			links: rssChannelItemsCache
 		});
 
@@ -203,7 +204,7 @@ function syncRSSChannel(rssChannel, forceCache) {
 					$(data).find('item').each(function() {
 						const link = $(this);
 						links.push({
-							pubDate: link.find('pubDate').text().replace('+0000', '').replace('GMT', '').trim(),
+							pubDate: link.find('pubDate').text().substring(0, 25),
 							title: link.find('title').text().trim(),
 							url: link.find('link').text().trim()
 						});
@@ -227,6 +228,7 @@ function syncRSSChannel(rssChannel, forceCache) {
 						rssChannel.newArticlesNumber = newArticlesNumber;
 
 					} else {
+						newArticlesNumber = links.length;
 						links.forEach((link) => {
 							link.isNew = true;
 						});
@@ -263,7 +265,7 @@ function cardsTransition(containerToHide, containerToShow, callback) {
 	});
 }
 
-function attachOnClickEventToRSSChannelsList() {
+function attachOnClickEventToRSSChannelsItem() {
 
 	$('.rss-channel-list-item').on('click', function() {
 
@@ -276,6 +278,7 @@ function attachOnClickEventToRSSChannelsList() {
 				jQuery('#rss-channel-links-ul').html('');
 				$.when(syncRSSChannel(rssChannelSelected))
 					.then((result) => {
+						rssChannelSelected.newArticlesNumber = result.newArticlesNumber;
 						printRSSChannelsLinks(result.links);
 					}, (error) => {
 						// TODO
