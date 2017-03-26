@@ -77,33 +77,33 @@ body{
 
 
 /* Containers */
-#add-rss-channel-container, #rss-channel-details-container{
+#add-rss-feed-container, #rss-feed-details-container{
 	display: none;
 }
 
 
-/* Add RSS Channel View elements */
-#add-rss-channel-form{
+/* Add RSS Feed View elements */
+#add-rss-feed-form{
 	flex-grow: 1;
 }
 
 
-/* RSS Channel Details elements */
-.rss-channel-link{
+/* RSS Feed Details elements */
+.rss-feed-link{
 	position: relative;
 }
 
-.rss-channel-link .rss-channel-link-title{
+.rss-feed-link .rss-feed-link-title{
 	font-size: 14px;
 }
 
-#rss-channel-links-ul .rss-channel-link .rss-channel-link-date{
+#rss-feed-links-ul .rss-feed-link .rss-feed-link-date{
 	color: white;
 	font-size: 12px;
 	text-align: right;
 }
 
-.rss-channel-link .rss-channel-link-is-new{
+.rss-feed-link .rss-feed-link-is-new{
 	bottom: 0;
 	left: 0;
 	position: absolute;

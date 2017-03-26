@@ -1,10 +1,10 @@
 const OTHER_BOOKMARKS_FOLDER_ID = '2';
-const RSS_CHANNELS_FOLDER_NAME = 'RSS Reader - Channels';
+const RSS_FEEDS_FOLDER_NAME = 'RSS Reader - Feeds';
 
-let rssChannelsFolderId = '';
-let rssChannelSelected = {};
-let rssChannelSelectedLinks = [];
-let rssChannelsList = [];
+let rssFeedsFolderId = '';
+let rssFeedSelected = {};
+let rssFeedSelectedLinks = [];
+let rssFeedsList = [];
 
 const BookmarksUtil = {
 
@@ -25,11 +25,11 @@ const BookmarksUtil = {
 
 		chrome.bookmarks.remove(bookmark.id, () => {
 
-			rssChannelsList = rssChannelsList.filter((item) => {
+			rssFeedsList = rssFeedsList.filter((item) => {
 				return item.id !== bookmark.id;
 			});
 
-			RSSChannelsUtil.removeRSSChannelLinks(bookmark.id);
+			RSSFeedsUtil.removeRSSFeedLinks(bookmark.id);
 
 			dfd.resolve('finished');
 		});
@@ -41,50 +41,50 @@ const BookmarksUtil = {
 
 const UI_Util = {
 
-	getRSSChannelListItemTemplate: (rssChannel) => {
+	getRSSFeedListItemTemplate: (rssFeed) => {
 
-		const displayNewArticlesNumber = rssChannel.newArticlesNumber === 0 ? "display:none" : "display:inline-block";
+		const displayNewArticlesNumber = rssFeed.newArticlesNumber === 0 ? "display:none" : "display:inline-block";
 
-		return `<li class="collection-item rss-channel-list-item" data-rss-channel-id="${rssChannel.id}">
-					${rssChannel.title}
+		return `<li class="collection-item rss-feed-list-item" data-rss-feed-id="${rssFeed.id}">
+					${rssFeed.title}
 					<i class="material-icons right grey-text text-lighten-3">send</i>
-					<span class="new badge right red darken-3" style="${displayNewArticlesNumber}">${rssChannel.newArticlesNumber}</span>
+					<span class="new badge right red darken-3" style="${displayNewArticlesNumber}">${rssFeed.newArticlesNumber}</span>
 				</li>`;
 	},
 
-	getRSSChannelLinkTemplate: (index, link) => {
+	getRSSFeedLinkTemplate: (index, link) => {
 
 		const displayIsNew = !link.isNew ? "display:none" : "display:block";
 
-		return `<li data-rss-channel-link-url="${link.url}" target="_blank" class="collection-item rss-channel-link" data-rss-channel-link-index="${index}">
-					<p class="rss-channel-link-title">${link.title}</p>
-					<p class="rss-channel-link-date">${link.pubDate}</p>
-					<span class="new badge right red darken-3 rss-channel-link-is-new" style="${displayIsNew}"></span>
+		return `<li data-rss-feed-link-url="${link.url}" target="_blank" class="collection-item rss-feed-link" data-rss-feed-link-index="${index}">
+					<p class="rss-feed-link-title">${link.title}</p>
+					<p class="rss-feed-link-date">${link.pubDate}</p>
+					<span class="new badge right red darken-3 rss-feed-link-is-new" style="${displayIsNew}"></span>
 				</li>`;
 	},
 
-	printRSSChannelsList: (rssChannelsList) => {
+	printRSSFeedsList: (rssFeedsList) => {
 
-		RSSChannelsUtil.sortRSSChannelsByName(rssChannelsList);
+		RSSFeedsUtil.sortRSSFeedsByName(rssFeedsList);
 
 		let html = '';
-		rssChannelsList.forEach((rssChannel) => {
-			html += UI_Util.getRSSChannelListItemTemplate(rssChannel);
+		rssFeedsList.forEach((rssFeed) => {
+			html += UI_Util.getRSSFeedListItemTemplate(rssFeed);
 		});
 
-		jQuery('#rss-channels-list-ul').html(html);
-		OnClickFunctions.attachOnClickEventToRSSChannelItem();
+		jQuery('#rss-feeds-list-ul').html(html);
+		OnClickFunctions.attachOnClickEventToRSSFeedItem();
 	},
 
-	printRSSChannelLinks: (links) => {
+	printRSSFeedLinks: (links) => {
 
 		let html = '';
 		links.forEach((link, index) => {
-			html += UI_Util.getRSSChannelLinkTemplate(index, link);
+			html += UI_Util.getRSSFeedLinkTemplate(index, link);
 		});
 
-		jQuery('#rss-channel-links-ul').html(html).show();
-		OnClickFunctions.attachOnClickEventToRSSChannelLinkItem();
+		jQuery('#rss-feed-links-ul').html(html).show();
+		OnClickFunctions.attachOnClickEventToRSSFeedLinkItem();
 	},
 
 	cardsTransition: (containerToHide, containerToShow, callback) => {
@@ -98,18 +98,18 @@ const UI_Util = {
 
 };
 
-const RSSChannelsUtil = {
+const RSSFeedsUtil = {
 
-	sortRSSChannelsByName: (rssChannelsList) => {
-		rssChannelsList.sort((a, b) => {
+	sortRSSFeedsByName: (rssFeedsList) => {
+		rssFeedsList.sort((a, b) => {
 			return a.title > b.title;
 		});
 	},
 
-	getRSSChannelById: (rssChannelsList, rssChannelId) => {
+	getRSSFeedById: (rssFeedsList, rssFeedId) => {
 
-		const results = rssChannelsList.filter((item) => {
-			return item.id == rssChannelId;
+		const results = rssFeedsList.filter((item) => {
+			return item.id == rssFeedId;
 		});
 
 		if (results.length === 1) {
@@ -119,36 +119,36 @@ const RSSChannelsUtil = {
 		return null;
 	},
 
-	fetchRSSChannelsList: () => {
+	fetchRSSFeedsList: () => {
 
 		chrome.bookmarks.getChildren(OTHER_BOOKMARKS_FOLDER_ID, (results) => {
 
 			const filterResults = results.filter((item) => {
-				return item.title === RSS_CHANNELS_FOLDER_NAME;
+				return item.title === RSS_FEEDS_FOLDER_NAME;
 			});
 
 			if (filterResults.length === 0) {
 
 				$.when(BookmarksUtil.createBookmark({
 						parentId: OTHER_BOOKMARKS_FOLDER_ID,
-						title: RSS_CHANNELS_FOLDER_NAME
+						title: RSS_FEEDS_FOLDER_NAME
 					}))
 					.then((newBookmark) => {
-						rssChannelsFolderId = newBookmark.id;
+						rssFeedsFolderId = newBookmark.id;
 					});
 
 			} else {
 
-				rssChannelsFolderId = filterResults[0].id;
+				rssFeedsFolderId = filterResults[0].id;
 
-				chrome.bookmarks.getChildren(rssChannelsFolderId, (results) => {
+				chrome.bookmarks.getChildren(rssFeedsFolderId, (results) => {
 
-					rssChannelsList = rssChannelsList.concat(results);
+					rssFeedsList = rssFeedsList.concat(results);
 
-					rssChannelsList.forEach((item) => {
+					rssFeedsList.forEach((item) => {
 
 						let newArticlesNumber = 0;
-						const links = RSSChannelsUtil.getRSSChannelLinks(item.id);
+						const links = RSSFeedsUtil.getRSSFeedLinks(item.id);
 
 						if (links) {
 							links.forEach((link) => {
@@ -161,7 +161,7 @@ const RSSChannelsUtil = {
 						item.newArticlesNumber = newArticlesNumber;
 					});
 
-					UI_Util.printRSSChannelsList(rssChannelsList);
+					UI_Util.printRSSFeedsList(rssFeedsList);
 				});
 
 			}
@@ -181,45 +181,45 @@ const RSSChannelsUtil = {
 		return true;
 	},
 
-	getRSSChannelLinks: (rssChannelId) => {
+	getRSSFeedLinks: (rssFeedId) => {
 		try {
-			return JSON.parse(window.localStorage.getItem('rss_channel_' + rssChannelId)).links;
+			return JSON.parse(window.localStorage.getItem('rss_feed_' + rssFeedId)).links;
 		} catch (e) {
 			return null;
 		}
 	},
 
-	saveRSSChannelLinks: (links, rssChannelId) => {
-		window.localStorage.setItem('rss_channel_' + rssChannelId, JSON.stringify({
+	saveRSSFeedLinks: (links, rssFeedId) => {
+		window.localStorage.setItem('rss_feed_' + rssFeedId, JSON.stringify({
 			links
 		}));
 	},
 
-	removeRSSChannelLinks: (rssChannelId) => {
-		window.localStorage.removeItem('rss_channel_' + rssChannelId);
+	removeRSSFeedLinks: (rssFeedId) => {
+		window.localStorage.removeItem('rss_feed_' + rssFeedId);
 	},
 
-	rejectSyncRSSChannel: (rssChannel, defered) => {
-		rssChannel.newArticlesNumber = 0;
-		RSSChannelsUtil.removeRSSChannelLinks(rssChannel.id);
-		return defered.reject(rssChannel);
+	rejectSyncRSSFeed: (rssFeed, defered) => {
+		rssFeed.newArticlesNumber = 0;
+		RSSFeedsUtil.removeRSSFeedLinks(rssFeed.id);
+		return defered.reject(rssFeed);
 	},
 
-	syncRSSChannel: (rssChannel, forceCache) => {
+	syncRSSFeed: (rssFeed, forceCache) => {
 
 		const dfd = jQuery.Deferred();
-		const rssChannelLinksCache = RSSChannelsUtil.getRSSChannelLinks(rssChannel.id);
-		let newArticlesNumber = rssChannel.newArticlesNumber;
+		const rssFeedLinksCache = RSSFeedsUtil.getRSSFeedLinks(rssFeed.id);
+		let newArticlesNumber = rssFeed.newArticlesNumber;
 
-		if (rssChannelLinksCache && !forceCache) {
+		if (rssFeedLinksCache && !forceCache) {
 
 			dfd.resolve({
-				links: rssChannelLinksCache
+				links: rssFeedLinksCache
 			});
 
 		} else {
 
-			$.ajax('https://crossorigin.me/' + rssChannel.url, {
+			$.ajax('https://crossorigin.me/' + rssFeed.url, {
 				accepts: {
 					xml: 'application/rss+xml'
 				},
@@ -240,16 +240,16 @@ const RSSChannelsUtil = {
 						});
 
 						if (links.length === 0) {
-							return RSSChannelsUtil.rejectSyncRSSChannel(rssChannel, dfd);
+							return RSSFeedsUtil.rejectSyncRSSFeed(rssFeed, dfd);
 						}
 
-						const rssChannelLinksCache = RSSChannelsUtil.getRSSChannelLinks(rssChannel.id);
+						const rssFeedLinksCache = RSSFeedsUtil.getRSSFeedLinks(rssFeed.id);
 
-						if (rssChannelLinksCache) {
+						if (rssFeedLinksCache) {
 
 							links.forEach((link) => {
 
-								const isLinkNew = RSSChannelsUtil.checkIfLinkIsNew(rssChannelLinksCache, link);
+								const isLinkNew = RSSFeedsUtil.checkIfLinkIsNew(rssFeedLinksCache, link);
 								link.isNew = isLinkNew;
 
 								if (isLinkNew) {
@@ -258,7 +258,7 @@ const RSSChannelsUtil = {
 
 							});
 
-							rssChannel.newArticlesNumber = newArticlesNumber;
+							rssFeed.newArticlesNumber = newArticlesNumber;
 
 						} else {
 							newArticlesNumber = links.length;
@@ -267,20 +267,20 @@ const RSSChannelsUtil = {
 							});
 						}
 
-						RSSChannelsUtil.saveRSSChannelLinks(links, rssChannel.id);
-						rssChannel.newArticlesNumber = newArticlesNumber;
+						RSSFeedsUtil.saveRSSFeedLinks(links, rssFeed.id);
+						rssFeed.newArticlesNumber = newArticlesNumber;
 
 						dfd.resolve({
 							links
 						});
 
 					} catch (e) {
-						RSSChannelsUtil.rejectSyncRSSChannel(rssChannel, dfd);
+						RSSFeedsUtil.rejectSyncRSSFeed(rssFeed, dfd);
 					}
 
 				},
 				error: (data) => {
-					RSSChannelsUtil.rejectSyncRSSChannel(rssChannel, dfd);
+					RSSFeedsUtil.rejectSyncRSSFeed(rssFeed, dfd);
 				}
 			});
 
@@ -294,28 +294,28 @@ const RSSChannelsUtil = {
 const OnClickFunctions = {
 
 	backToHomeView: function() {
-		UI_Util.printRSSChannelsList(rssChannelsList);
-		UI_Util.cardsTransition($(this).data('parent-container-id'), '#rss-channels-list-container');
+		UI_Util.printRSSFeedsList(rssFeedsList);
+		UI_Util.cardsTransition($(this).data('parent-container-id'), '#rss-feeds-list-container');
 	},
 
-	showAddRSSChannelView: () => {
-		UI_Util.cardsTransition('#rss-channels-list-container', '#add-rss-channel-container');
+	showAddRSSFeedView: () => {
+		UI_Util.cardsTransition('#rss-feeds-list-container', '#add-rss-feed-container');
 	},
 
-	syncAllRSSChannels: () => {
+	syncAllRSSFeeds: () => {
 
-		const defereds = rssChannelsList.map((rssChannel) => {
-			return syncRSSChannel(rssChannel);
+		const defereds = rssFeedsList.map((rssFeed) => {
+			return syncRSSFeed(rssFeed);
 		});
 
 		$.when.apply($, defereds).then(() => {
-			UI_Util.printRSSChannelsList(rssChannelsList);
+			UI_Util.printRSSFeedsList(rssFeedsList);
 		}, () => {
-			UI_Util.printRSSChannelsList(rssChannelsList);
+			UI_Util.printRSSFeedsList(rssFeedsList);
 		});
 	},
 
-	addRSSChannel: (event) => {
+	addRSSFeed: (event) => {
 
 		event.preventDefault();
 
@@ -325,44 +325,44 @@ const OnClickFunctions = {
 		if (url && title) {
 
 			$.when(BookmarksUtil.createBookmark({
-				parentId: rssChannelsFolderId,
+				parentId: rssFeedsFolderId,
 				title,
 				url
 			})).then((newBookmark) => {
 				newBookmark.newArticlesNumber = 0;
-				rssChannelsList.push(newBookmark);
-				UI_Util.cardsTransition('#add-rss-channel-container', '#rss-channels-list-container');
-				UI_Util.printRSSChannelsList(rssChannelsList);
+				rssFeedsList.push(newBookmark);
+				UI_Util.cardsTransition('#add-rss-feed-container', '#rss-feeds-list-container');
+				UI_Util.printRSSFeedsList(rssFeedsList);
 				$('#input-url, #input-title').val('');
 			});
 
 		}
 	},
 
-	removeRSSChannel: () => {
-		BookmarksUtil.removeBookmark(rssChannelSelected)
+	removeRSSFeed: () => {
+		BookmarksUtil.removeBookmark(rssFeedSelected)
 			.then(() => {
-				UI_Util.cardsTransition('#rss-channel-details-container', '#rss-channels-list-container');
-				UI_Util.printRSSChannelsList(rssChannelsList);
+				UI_Util.cardsTransition('#rss-feed-details-container', '#rss-feeds-list-container');
+				UI_Util.printRSSFeedsList(rssFeedsList);
 			});
 	},
 
-	syncRSSChannel: () => {
+	syncRSSFeed: () => {
 
-		jQuery('#rss-channel-links-ul').hide();
+		jQuery('#rss-feed-links-ul').hide();
 		jQuery('#error-message').hide();
 
-		$.when(RSSChannelsUtil.syncRSSChannel(rssChannelSelected, true))
+		$.when(RSSFeedsUtil.syncRSSFeed(rssFeedSelected, true))
 			.then((result) => {
-				UI_Util.printRSSChannelLinks(result.links);
+				UI_Util.printRSSFeedLinks(result.links);
 			}, (error) => {
-				jQuery('#error-message').text('RSS Channel content cannot be loaded.').show();
+				jQuery('#error-message').text('RSS Feed content cannot be loaded.').show();
 			});
 	},
 
-	markAsReadAllRSSChannelLinks: () => {
+	markAsReadAllRSSFeedLinks: () => {
 
-		const links = RSSChannelsUtil.getRSSChannelLinks(rssChannelSelected.id);
+		const links = RSSFeedsUtil.getRSSFeedLinks(rssFeedSelected.id);
 
 		if (links) {
 
@@ -370,80 +370,80 @@ const OnClickFunctions = {
 				link.isNew = false;
 			});
 
-			RSSChannelsUtil.saveRSSChannelLinks(links, rssChannelSelected.id);
-			rssChannelSelected.newArticlesNumber = 0;
-			UI_Util.printRSSChannelLinks(links);
+			RSSFeedsUtil.saveRSSFeedLinks(links, rssFeedSelected.id);
+			rssFeedSelected.newArticlesNumber = 0;
+			UI_Util.printRSSFeedLinks(links);
 		}
 
 	},
 
-	selectRSSChannelListItem: function() {
+	selectRSSFeedListItem: function() {
 
 		const item = $(this);
-		rssChannelSelected = RSSChannelsUtil.getRSSChannelById(rssChannelsList, item.data('rss-channel-id'));
+		rssFeedSelected = RSSFeedsUtil.getRSSFeedById(rssFeedsList, item.data('rss-feed-id'));
 
 		const callback = () => {
-			jQuery('#rss-channel-links-ul').scrollTop(0).hide();
+			jQuery('#rss-feed-links-ul').scrollTop(0).hide();
 			jQuery('#error-message').hide();
-			$.when(RSSChannelsUtil.syncRSSChannel(rssChannelSelected))
+			$.when(RSSFeedsUtil.syncRSSFeed(rssFeedSelected))
 				.then((result) => {
-					UI_Util.printRSSChannelLinks(result.links);
+					UI_Util.printRSSFeedLinks(result.links);
 				}, (error) => {
-					jQuery('#error-message').text('RSS Channel content cannot be loaded.').show();
+					jQuery('#error-message').text('RSS Feed content cannot be loaded.').show();
 				});
 		};
 
-		UI_Util.cardsTransition('#rss-channels-list-container', '#rss-channel-details-container', callback);
-		$('#rss-channel-title').text(rssChannelSelected.title);
+		UI_Util.cardsTransition('#rss-feeds-list-container', '#rss-feed-details-container', callback);
+		$('#rss-feed-title').text(rssFeedSelected.title);
 	},
 
-	selectRSSChannelLink: function() {
+	selectRSSFeedLink: function() {
 
 		const link = $(this);
 
 		chrome.tabs.create({
-			url: link.data('rss-channel-link-url'),
+			url: link.data('rss-feed-link-url'),
 			active: false
 		});
 
 		link.find('.badge').hide();
 
-		if (rssChannelSelected.newArticlesNumber > 0) {
-			rssChannelSelected.newArticlesNumber = rssChannelSelected.newArticlesNumber - 1;
+		if (rssFeedSelected.newArticlesNumber > 0) {
+			rssFeedSelected.newArticlesNumber = rssFeedSelected.newArticlesNumber - 1;
 		}
 
-		const links = RSSChannelsUtil.getRSSChannelLinks(rssChannelSelected.id);
-		links[parseInt(link.data('rss-channel-link-index'))].isNew = false;
-		RSSChannelsUtil.saveRSSChannelLinks(links, rssChannelSelected.id);
+		const links = RSSFeedsUtil.getRSSFeedLinks(rssFeedSelected.id);
+		links[parseInt(link.data('rss-feed-link-index'))].isNew = false;
+		RSSFeedsUtil.saveRSSFeedLinks(links, rssFeedSelected.id);
 	},
 
-	attachOnClickEventToRSSChannelItem: () => {
-		$('.rss-channel-list-item').on('click', OnClickFunctions.selectRSSChannelListItem);
+	attachOnClickEventToRSSFeedItem: () => {
+		$('.rss-feed-list-item').on('click', OnClickFunctions.selectRSSFeedListItem);
 	},
 
-	attachOnClickEventToRSSChannelLinkItem: () => {
-		$('.rss-channel-link').on('click', OnClickFunctions.selectRSSChannelLink);
+	attachOnClickEventToRSSFeedLinkItem: () => {
+		$('.rss-feed-link').on('click', OnClickFunctions.selectRSSFeedLink);
 	}
 
 };
 
 $(document).ready(() => {
 
-	RSSChannelsUtil.fetchRSSChannelsList();
+	RSSFeedsUtil.fetchRSSFeedsList();
 
 	// General
 	$('.back-to-home-btn').on('click', OnClickFunctions.backToHomeView);
 
-	// RSS Channels List View
-	$('#show-add-rss-channel-view-btn').on('click', OnClickFunctions.showAddRSSChannelView);
-	$('#update-all-rss-channels-btn').on('click', OnClickFunctions.syncAllRSSChannels);
+	// RSS Feeds List View
+	$('#show-add-rss-feed-view-btn').on('click', OnClickFunctions.showAddRSSFeedView);
+	$('#update-all-rss-feeds-btn').on('click', OnClickFunctions.syncAllRSSFeeds);
 
-	// Add RSS Channels View
-	$('#add-rss-channel-form').on('submit', OnClickFunctions.addRSSChannel);
+	// Add RSS Feeds View
+	$('#add-rss-feed-form').on('submit', OnClickFunctions.addRSSFeed);
 
-	// RSS Channel Details View
-	$('#remove-rss-channel-btn').on('click', OnClickFunctions.removeRSSChannel);
-	$('#sync-rss-channel-btn').on('click', OnClickFunctions.syncRSSChannel);
-	$('#check-all-rss-channel-btn').on('click', OnClickFunctions.markAsReadAllRSSChannelLinks);
+	// RSS Feed Details View
+	$('#remove-rss-feed-btn').on('click', OnClickFunctions.removeRSSFeed);
+	$('#sync-rss-feed-btn').on('click', OnClickFunctions.syncRSSFeed);
+	$('#check-all-rss-feed-btn').on('click', OnClickFunctions.markAsReadAllRSSFeedLinks);
 
 });
