@@ -305,7 +305,7 @@ const OnClickFunctions = {
 	syncAllRSSFeeds: () => {
 
 		const defereds = rssFeedsList.map((rssFeed) => {
-			return RSSFeedsUtil.syncRSSFeed(rssFeed);
+			return RSSFeedsUtil.syncRSSFeed(rssFeed, true);
 		});
 
 		$.when.apply($, defereds).then(() => {
