@@ -89,7 +89,7 @@ const UI_Util = {
 
 	cardsTransition: (containerToHide, containerToShow, callback) => {
 		$(containerToHide).fadeOut('slow', () => {
-			$(containerToShow).fadeIn(1000);
+			$(containerToShow).fadeIn(500);
 			if (callback) {
 				callback();
 			}
@@ -110,13 +110,9 @@ const RSSFeedsUtil = {
 
 		const results = rssFeedsList.filter((item) => {
 			return item.id == rssFeedId;
-		});
+		})[0];
 
-		if (results.length === 1) {
-			return results[0];
-		}
-
-		return null;
+		return results;
 	},
 
 	fetchRSSFeedsList: () => {
@@ -230,7 +226,7 @@ const RSSFeedsUtil = {
 
 						let links = [];
 
-						$(data).find('item').each(function() {
+						$(data).find('item').each(function () {
 							const link = $(this);
 							links.push({
 								pubDate: link.find('pubDate').text().substring(0, 25),
@@ -293,7 +289,7 @@ const RSSFeedsUtil = {
 
 const OnClickFunctions = {
 
-	backToHomeView: function() {
+	backToHomeView: function () {
 		UI_Util.printRSSFeedsList(rssFeedsList);
 		UI_Util.cardsTransition($(this).data('parent-container-id'), '#rss-feeds-list-container');
 	},
@@ -377,7 +373,7 @@ const OnClickFunctions = {
 
 	},
 
-	selectRSSFeedListItem: function() {
+	selectRSSFeedListItem: function () {
 
 		const item = $(this);
 		rssFeedSelected = RSSFeedsUtil.getRSSFeedById(rssFeedsList, item.data('rss-feed-id'));
@@ -397,7 +393,7 @@ const OnClickFunctions = {
 		$('#rss-feed-title').text(rssFeedSelected.title);
 	},
 
-	selectRSSFeedLink: function() {
+	selectRSSFeedLink: function () {
 
 		const link = $(this);
 
